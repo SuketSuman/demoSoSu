@@ -91,10 +91,12 @@ const Polygon = ({ room }) => {
     const newX = e.movementX;
     const newY = e.movementY;
 
-    const newVertices = room.vertices.map((vertex) => ({
-      x: vertex.x + newX,
-      y: vertex.y + newY,
-    }));
+    const newVertices = room.vertices.map((vertex, index) => {
+      return {
+        x: index === 1 || index === 2 ? newX + vertex.x : vertex.x,
+        y: vertex.y + newY,
+      };
+    });
 
     const newRoom = {
       ...room,
