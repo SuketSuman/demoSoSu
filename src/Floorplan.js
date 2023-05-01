@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useEffect } from "react";
 
 function Floorplan({ rooms }) {
   const [draggedRoom, setDraggedRoom] = useState(null);
@@ -67,7 +68,18 @@ function Floorplan({ rooms }) {
 const Polygon = ({ room }) => {
   const [currRoom, setCurrRoom] = useState(room);
   const isMouseDown = useRef(null);
+  const elemRef = useRef(null);
+
+  useEffect(() => {
+    document.addEventListener("mouseup", () => {
+      isMouseDown.current = false;
+    });
+  }, []);
+
   function handleMouseMove(e, room) {
+    // return;
+    console.log("mouse move");
+
     console.log(e);
 
     if (!isMouseDown.current) return;
@@ -101,12 +113,19 @@ const Polygon = ({ room }) => {
         .join(" ")}
       fill="#fff"
       stroke="#000"
+      draggable={true}
       strokeWidth={2}
       onMouseMove={(e) => handleMouseMove(e, currRoom)}
       onMouseUp={(e) => {
+        console.log("mouse up");
         isMouseDown.current = false;
       }}
+      onDragEnd={(e) => console.log("drag end")}
+      onDragStart={(e) => console.log("drag end")}
+      onDrag={(e) => console.log("drag end")}
       onMouseDown={(e) => {
+        console.log("mouse down");
+
         isMouseDown.current = true;
       }}
       // onMouseUp={(e) => handleMouseUp(e, room)}
