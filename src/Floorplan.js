@@ -2,71 +2,19 @@ import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 
 function Floorplan({ rooms }) {
-  const [draggedRoom, setDraggedRoom] = useState(null);
-
-  function handleMouseDown(e, room) {
-    console.log(room);
-    setDraggedRoom(room);
-  }
-
-  function handleMouseMove(e, room) {
-    console.log(room);
-    if (!room) {
-      return;
-    }
-    console.log(e);
-    const newX = e.pageX;
-    const newY = e.pageY;
-
-    const newVertices = room.vertices.map((vertex) => ({
-      x: vertex.x + newX,
-      y: vertex.y + newY,
-    }));
-
-    const newRoom = {
-      ...room,
-      vertices: newVertices,
-    };
-
-    setDraggedRoom(newRoom);
-  }
-
-  function handleMouseUp() {
-    setDraggedRoom(null);
-  }
-
   return (
     <svg width="800" height="1000">
-      {rooms.map(
-        (room, index) => {
-          return (
-            <Polygon
-              room={room}
-              key={room.name}
-              handleMouseMove={handleMouseMove}
-            />
-          );
-        }
-
-        // <polygon
-        //   key={room.name}
-        //   points={room.vertices
-        //     .map((vertex) => `${vertex.x},${vertex.y}`)
-        //     .join(" ")}
-        //   fill="#fff"
-        //   stroke="#000"
-        //   strokeWidth={2}
-        //   onMouseMove={(e) => handleMouseMove(e, room)}
-        //   onMouseUp={(e) => handleMouseUp(e, room)}
-        //   onMouseDown={(e) => handleMouseDown(e, room)}
-        // />
-      )}
+      {rooms.map((room, index) => {
+        return <Polygon room={room} key={room.name} sidRoom={rooms[41]} />;
+      })}
     </svg>
   );
 }
 
-const Polygon = ({ room }) => {
+const Polygon = ({ room, sidRoom }) => {
   const [currRoom, setCurrRoom] = useState(room);
+  const [sideRoom, setSideRoom] = useState(sidRoom);
+
   const isMouseDown = useRef(null);
   const elemRef = useRef(null);
 
@@ -76,37 +24,55 @@ const Polygon = ({ room }) => {
     });
   }, []);
 
-  function handleMouseMove(e, room) {
+  function handleMouseMove(e, room, sideRoom) {
     // return;
-    console.log("mouse move");
-
-    console.log(e);
+    // console.log("mouse move");
 
     if (!isMouseDown.current) return;
-    console.log(room);
-    if (!room) {
-      return;
-    }
-    console.log(e);
+    // console.log(room);
+    // if (!room) {
+    //   return;
+    // }
+    console.log("olde side Room = ", sideRoom);
+
     const newX = e.movementX;
     const newY = e.movementY;
+    console.log("x movement", newX);
+    let newVertices = room.vertices;
+    let newSideRoomVertices = sideRoom.vertices;
 
-    const newVertices = room.vertices.map((vertex, index) => {
-      return {
-        x: index === 1 || index === 2 ? newX + vertex.x : vertex.x,
-        y: vertex.y + newY,
-      };
-    });
+    if (room?.name == "room43") {
+      newVertices = room.vertices.map((vertex, index) => {
+        return {
+          x: index === 2 || index === 3 ? newX + vertex.x : vertex.x,
+          y: vertex.y,
+        };
+      });
+      newSideRoomVertices = sideRoom.vertices.map((vertex, index) => {
+        return {
+          x: index === 1 || index === 2 ? newX + vertex.x : vertex.x,
+          y: vertex.y,
+        };
+      });
+    }
 
     const newRoom = {
       ...room,
       vertices: newVertices,
     };
-    console.log("saurav room = ", room);
-    console.log("saurav newRoom = ", newRoom);
+    const newSideRoom = {
+      ...sideRoom,
+      vertices: newSideRoomVertices,
+    };
+    // console.log("room = ", room);
+    // console.log("newRoom = ", newRoom);
     // setDraggedRoom(newRoom);
+    console.log("sideRoom =", newSideRoom);
     setCurrRoom(newRoom);
+    // setCurrRoom(newSideRoom);
+    setSideRoom(newSideRoom);
   }
+
   return (
     <polygon
       key={currRoom.name}
@@ -117,7 +83,7 @@ const Polygon = ({ room }) => {
       stroke="#000"
       draggable={true}
       strokeWidth={2}
-      onMouseMove={(e) => handleMouseMove(e, currRoom)}
+      onMouseMove={(e) => handleMouseMove(e, currRoom, sideRoom)}
       onMouseUp={(e) => {
         console.log("mouse up");
         isMouseDown.current = false;
