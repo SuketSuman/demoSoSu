@@ -4,7 +4,7 @@ import _debounce from "lodash/debounce";
 
 function Floorplan({ rooms }) {
   const [roomsData, setRoomsData] = useState(rooms);
-
+  const [indexClicked, setIndexClicked] = useState(0);
   // //console.log("roomsData = ", roomsData);
 
   const updateRoomsData = (mainRoom, dx, direction) => {
@@ -53,8 +53,26 @@ function Floorplan({ rooms }) {
     setRoomsData(roomsNewData);
   };
 
+  const _setIndexClicked = (index) => {
+    if (indexClicked !== index) {
+      setIndexClicked(index);
+    }
+  };
+
   return (
-    <svg width="800" height="1000">
+    <svg
+      width="800"
+      height="1000"
+      onMouseMove={(e) => console.log("mouse move")}
+      onMouseUp={(e) => {
+        // console.log("mouse e", e);
+        // handleMouseMove(e, room, sideRoom);
+        console.log("mouse up", indexClicked);
+      }}
+      onMouseDown={(e) => {
+        console.log("mouse down");
+      }}
+    >
       {roomsData.map((room, index) => {
         return (
           <Polygon
@@ -62,6 +80,8 @@ function Floorplan({ rooms }) {
             key={room.name}
             sideRoom={rooms[41]}
             updateRoomsData={updateRoomsData}
+            setIndexClicked={_setIndexClicked}
+            index={index}
           />
         );
       })}
@@ -69,53 +89,59 @@ function Floorplan({ rooms }) {
   );
 }
 
-const Polygon = ({ room, sideRoom, updateRoomsData }) => {
+const Polygon = ({
+  room,
+  sideRoom,
+  updateRoomsData,
+  setIndexClicked,
+  index,
+}) => {
   const currCoord = useRef(room.vertices);
 
   const isMouseDown = useRef(false);
   const elemRef = useRef(null);
   const roomRef = useRef(null);
 
-  function handleMouseMove(e, key) {
-    console.log(isMouseDown.current);
-    // console.log(e);
-    // if(key==="room43") {
+  // function handleMouseMove(e, key) {
+  //   console.log(isMouseDown.current);
+  //   // console.log(e);
+  //   // if(key==="room43") {
 
-    // }
-    if (!isMouseDown.current) return;
+  //   // }
+  //   if (!isMouseDown.current) return;
 
-    if (key === "room43") {
-      isMouseDown.current = true;
-    }
-    console.log(e);
-    console.log(key);
-    const dx = e.movementX;
-    // console.log("dx return = ", dx);
+  //   if (key === "room43") {
+  //     isMouseDown.current = true;
+  //   }
+  //   console.log(e);
+  //   console.log(key);
+  //   const dx = e.movementX;
+  //   // console.log("dx return = ", dx);
 
-    let newVertices = [...room.vertices];
-    if (room?.name == "room43") {
-      newVertices = newVertices.map((vertex, index) => {
-        return {
-          x: index === 2 || index === 3 ? dx + vertex.x : vertex.x,
-          y: vertex.y,
-        };
-      });
-    }
+  //   let newVertices = [...room.vertices];
+  //   if (room?.name == "room43") {
+  //     newVertices = newVertices.map((vertex, index) => {
+  //       return {
+  //         x: index === 2 || index === 3 ? dx + vertex.x : vertex.x,
+  //         y: vertex.y,
+  //       };
+  //     });
+  //   }
 
-    const newRoom = {
-      ...room,
-      vertices: newVertices,
-    };
-    // console.log("newroom = ", room);
-    updateRoomsData(
-      {
-        index: 42,
-        data: newRoom,
-      },
-      dx,
-      dx < 0 ? "left" : "right"
-    );
-  }
+  //   const newRoom = {
+  //     ...room,
+  //     vertices: newVertices,
+  //   };
+  //   // console.log("newroom = ", room);
+  //   updateRoomsData(
+  //     {
+  //       index: 42,
+  //       data: newRoom,
+  //     },
+  //     dx,
+  //     dx < 0 ? "left" : "right"
+  //   );
+  // }
 
   // useEffect(() => {}, []);
 
@@ -134,22 +160,22 @@ const Polygon = ({ room, sideRoom, updateRoomsData }) => {
       stroke="#000"
       draggable={true}
       strokeWidth={2}
-      onMouseMove={(e) => handleMouseMove(e, room.name)}
-      onMouseUp={(e) => {
-        // console.log("mouse e", e);
-        // handleMouseMove(e, room, sideRoom);
-        // handleMouseUp(e);
+      // onMouseMove={(e) => handleMouseMove(e, room.name)}
+      // onMouseUp={(e) => {
+      //   // console.log("mouse e", e);
+      //   // handleMouseMove(e, room, sideRoom);
+      //   // handleMouseUp(e);
 
-        isMouseDown.current = false;
-        // console.log("setting to false", isMouseDown.current);
-      }}
-      onDragEnd={(e) => alert("drag end")}
-      onDragStart={(e) => alert("drag end")}
-      onDrag={(e) => alert("drag end")}
+      //   isMouseDown.current = false;
+      //   // console.log("setting to false", isMouseDown.current);
+      // }}
+      // onDragEnd={(e) => alert("drag end")}
+      // onDragStart={(e) => alert("drag end")}
+      // onDrag={(e) => alert("drag end")}
       onMouseDown={(e) => {
         //console.log("mouse down");
-
-        isMouseDown.current = true;
+        setIndexClicked(index);
+        // isMouseDown.current = true;
         // console.log("setting to true", isMouseDown.current);
       }}
       // onMouseUp={(e) => handleMouseUp(e, room)}
