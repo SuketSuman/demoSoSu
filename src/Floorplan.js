@@ -8,19 +8,20 @@ function Floorplan({ rooms }) {
   // //console.log("roomsData = ", roomsData);
 
   const updateRoomsData = (mainRoom, dx, direction) => {
-    const mainRoomIndex = mainRoom.index;
-    const sideRoomIndex = 41;
+    // const mainRoomIndex = mainRoom.index;
+    // const sideRoomIndex = 41;
     const roomsNewData = [...roomsData];
-    console.log(mainRoom);
+    console.log("old side room", roomsNewData[41]);
     roomsNewData[42] = mainRoom.data;
     // const dx = roomsNewData[42].vertices[0].x - roomsData[42].vertices[0].x;
     // const dy = roomsNewData[42].vertices[0].x - roomsData[42].vertices[0].x;
-    console.log("a = ", [...roomsNewData]);
+    console.log("x movement", dx);
+    console.log("direction", direction);
     roomsNewData[41] = {
       ...roomsNewData[41],
       vertices: [
         {
-          x: roomsNewData[41].vertices[0].x + (direction < 0 ? -dx : dx),
+          x: roomsNewData[41].vertices[0].x + dx,
           y: roomsNewData[41].vertices[0].y,
         },
         {
@@ -32,14 +33,15 @@ function Floorplan({ rooms }) {
           y: roomsNewData[41].vertices[2].y,
         },
         {
-          x: roomsNewData[41].vertices[3].x + (direction < 0 ? -dx : dx),
+          x: roomsNewData[41].vertices[3].x + dx,
           y: roomsNewData[41].vertices[3].y,
         },
       ],
       // x: roomsNewData[41].vertices[0].x - dx,
       // },
     };
-    console.log(roomsNewData);
+
+    console.log("sideRomData", roomsNewData[41]);
     // //console.log({
     //   i: roomsNewData[41],
     //   f: roomsData[41],
@@ -74,12 +76,22 @@ const Polygon = ({ room, sideRoom, updateRoomsData }) => {
   const elemRef = useRef(null);
   const roomRef = useRef(null);
 
-  function handleMouseUp(e) {
-    // alert(isMouseDown.current);
+  function handleMouseMove(e, key) {
     console.log(isMouseDown.current);
-    // if (!isMouseDown.current) return;
-    console.log("dx return = ", currCoord.current[0].x - e.clientX);
-    const dx = currCoord.current[0].x - e.clientX;
+    // console.log(e);
+    // if(key==="room43") {
+
+    // }
+    if (!isMouseDown.current) return;
+
+    if (key === "room43") {
+      isMouseDown.current = true;
+    }
+    console.log(e);
+    console.log(key);
+    const dx = e.movementX;
+    // console.log("dx return = ", dx);
+
     let newVertices = [...room.vertices];
     if (room?.name == "room43") {
       newVertices = newVertices.map((vertex, index) => {
@@ -94,22 +106,22 @@ const Polygon = ({ room, sideRoom, updateRoomsData }) => {
       ...room,
       vertices: newVertices,
     };
-    console.log("newroom = ", room);
+    // console.log("newroom = ", room);
     updateRoomsData(
       {
         index: 42,
         data: newRoom,
       },
-      currCoord.current[0].x - e.clientX,
+      dx,
       dx < 0 ? "left" : "right"
     );
   }
 
-  useEffect(() => {}, []);
+  // useEffect(() => {}, []);
 
-  const a = (e, room, sideRoom) => {
-    //console.log("called");
-  };
+  // const a = (e, room, sideRoom) => {
+  //   //console.log("called");
+  // };
 
   return (
     <polygon
@@ -122,14 +134,14 @@ const Polygon = ({ room, sideRoom, updateRoomsData }) => {
       stroke="#000"
       draggable={true}
       strokeWidth={2}
-      onMouseMove={(e) => a(e, room, sideRoom)}
+      onMouseMove={(e) => handleMouseMove(e, room.name)}
       onMouseUp={(e) => {
         // console.log("mouse e", e);
         // handleMouseMove(e, room, sideRoom);
-        handleMouseUp(e);
+        // handleMouseUp(e);
 
         isMouseDown.current = false;
-        console.log("setting to false", isMouseDown.current);
+        // console.log("setting to false", isMouseDown.current);
       }}
       onDragEnd={(e) => alert("drag end")}
       onDragStart={(e) => alert("drag end")}
@@ -138,7 +150,7 @@ const Polygon = ({ room, sideRoom, updateRoomsData }) => {
         //console.log("mouse down");
 
         isMouseDown.current = true;
-        console.log("setting to true", isMouseDown.current);
+        // console.log("setting to true", isMouseDown.current);
       }}
       // onMouseUp={(e) => handleMouseUp(e, room)}
       // onMouseDown={(e) => handleMouseDown(e, room)}
